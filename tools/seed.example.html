@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>RoundTable — Seed Members</title>
+<style>
+  body { font-family: sans-serif; max-width: 600px; margin: 60px auto; padding: 20px; }
+  button { background: #1B5E20; color: white; border: none; padding: 12px 24px;
+            border-radius: 8px; font-size: 16px; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #log { margin-top: 20px; font-size: 13px; line-height: 1.8; white-space: pre-wrap; }
+  .ok { color: #2e7d32; } .err { color: #c62828; }
+</style>
+</head>
+<body>
+<h2>RoundTable — Add Members</h2>
+<p>Edit the sample <code>members</code> list in this file first, then click the button to add them to Firestore. Serve the repo root locally (for example <code>python -m http.server</code>) and open <code>/tools/seed.example.html</code>.</p>
+<button id="btn" onclick="run()">Add all members</button>
+<div id="log"></div>
+
+<script type="module">
+import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { firebaseConfig } from '../public/js/firebase-config.js';
+import { getFirestore, doc, setDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const members = [
+  { email: "ada.example@yourcompany.com",   name: "Ada",   role: "member" },
+  { email: "bola.example@yourcompany.com",  name: "Bola",  role: "member" },
+  { email: "chidi.example@yourcompany.com", name: "Chidi", role: "member" },
+  { email: "dayo.example@yourcompany.com",  name: "Dayo",  role: "member" },
+  { email: "efe.example@yourcompany.com",   name: "Efe",   role: "member" },
+];
+
+window.run = async function() {
+  const btn = document.getElementById('btn');
+  const log = document.getElementById('log');
+  btn.disabled = true;
+  btn.textContent = 'Adding…';
+  let ok = 0, err = 0;
+  for (const m of members) {
+    try {
+      await setDoc(doc(db, 'allowed_emails', m.email), {
+        name: m.name, role: m.role, addedAt: serverTimestamp()
+      });
+      log.innerHTML += `<span class="ok">✓ ${m.email} (${m.name})</span>\n`;
+      ok++;
+    } catch(e) {
+      log.innerHTML += `<span class="err">✗ ${m.email} — ${e.message}</span>\n`;
+      err++;
+    }
+  }
+  btn.textContent = `Done — ${ok} added, ${err} errors`;
+};
+</script>
+</body>
+</html>

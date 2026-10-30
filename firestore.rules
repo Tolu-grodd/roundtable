@@ -1,0 +1,16 @@
+// WARNING: these rules are permissive on purpose (this started as a trusted internal tool).
+// Any signed-in session, including an anonymous one, can read and write every collection.
+// See "Known limitations" in the README before using this with real data.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Require a valid (anonymous-or-better) app session for any access.
+    // This blocks raw external API calls to your database while keeping
+    // the email-only login UX unchanged. The email whitelist remains the
+    // app-level access control.
+    function signedIn() { return request.auth != null; }
+    match /{document=**} {
+      allow read, write: if signedIn();
+    }
+  }
+}

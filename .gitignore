@@ -1,0 +1,9 @@
+.firebase/
+.firebaserc
+firebase-debug.log
+*.log
+.fuse_hidden*
+*.backup-*.html
+*.zip
+.env
+.DS_Store

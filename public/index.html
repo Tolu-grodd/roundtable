@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>RoundTable</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTUiIGZpbGw9IiMxQjVFMjAiLz48dGV4dCB4PSIzMiIgeT0iNDYiIGZvbnQtZmFtaWx5PSJJbnRlcixBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjQwIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjNzJDMjE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5SPC90ZXh0Pjwvc3ZnPg==">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <svg class="login-logo" viewBox="0 0 48 48" width="46" height="46" role="img" aria-label="RoundTable"><circle cx="24" cy="24" r="11" fill="#1B5E20"/><circle cx="24" cy="6" r="4" fill="#1B5E20"/><circle cx="24" cy="42" r="4" fill="#1B5E20"/><circle cx="6" cy="24" r="4" fill="#1B5E20"/><circle cx="42" cy="24" r="4" fill="#1B5E20"/></svg>
+    <div class="login-title">RoundTable</div>
+    <p class="login-sub">Enter your work email to continue</p>
+    <input id="login-email" type="email" class="login-input" placeholder="name@yourcompany.com"
+           onkeydown="if(event.key==='Enter')window.login()">
+    <button class="login-btn" onclick="window.login()">Continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    <p id="login-error" class="login-error"></p>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div id="net-banner" role="status" aria-live="polite" style="display:none;position:fixed;top:0;left:0;right:0;z-index:800;text-align:center;padding:7px;font-size:12.5px;font-weight:700;background:#d98a00;color:#fff">Reconnecting…</div>
+  <header class="header">
+    <div class="header-top">
+      <svg class="abis-logo logo-light" viewBox="0 0 48 48" width="46" height="46" role="img" aria-label="RoundTable"><circle cx="24" cy="24" r="11" fill="#1B5E20"/><circle cx="24" cy="6" r="4" fill="#1B5E20"/><circle cx="24" cy="42" r="4" fill="#1B5E20"/><circle cx="6" cy="24" r="4" fill="#1B5E20"/><circle cx="42" cy="24" r="4" fill="#1B5E20"/></svg><svg class="abis-logo logo-dark" viewBox="0 0 48 48" width="46" height="46" role="img" aria-label="RoundTable"><circle cx="24" cy="24" r="11" fill="#72C219"/><circle cx="24" cy="6" r="4" fill="#72C219"/><circle cx="24" cy="42" r="4" fill="#72C219"/><circle cx="6" cy="24" r="4" fill="#72C219"/><circle cx="42" cy="24" r="4" fill="#72C219"/></svg>
+      <div class="app-name">RoundTable</div>
+      <div style="flex:1"></div>
+      <span class="admin-badge" id="admin-badge" style="display:none">ADMIN</span>
+      <div class="session-count" id="session-count">0 topics</div>
+      <button class="theme-toggle" id="theme-toggle" onclick="window.toggleTheme()" aria-label="Toggle theme"><span class="ic-moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span class="ic-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span></button>
+      <span id="header-user" style="font-size:12px;font-weight:600;color:var(--text-secondary);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <button class="theme-toggle" onclick="window.logout()" style="font-size:11px;font-weight:700;width:auto;padding:0 10px;color:var(--text-primary);">Sign out</button>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="topics"  onclick="window.switchTab('topics')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg> Topics</button>
+      <button class="tab-btn"        data-tab="vote"    onclick="window.switchTab('vote')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5z"/><path d="M22 19H2"/></svg> Vote</button>
+      <button class="tab-btn"        data-tab="history" onclick="window.switchTab('history')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> History</button>
+      <button class="tab-btn"        data-tab="quiz"    onclick="window.switchTab('quiz')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Quiz</button>
+      <button class="tab-btn"        data-tab="members" id="tab-members" style="display:none" onclick="window.switchTab('members')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Members</button>
+    </div>
+  </header>
+
+  <!-- TOPICS -->
+  <div id="panel-topics" class="tab-panel active">
+    <div class="add-bar">
+      <input id="add-input" class="add-input" placeholder="New topic…" maxlength="120"
+             onkeydown="if(event.key==='Enter')window.addTopic()">
+      <textarea id="add-context" class="add-context" placeholder="Context / description (optional)" rows="2"></textarea>
+      <button class="add-btn" onclick="window.addTopic()">Add topic</button>
+    </div>
+    <div class="section-label">Topics on the table</div>
+    <div id="topic-list" class="topic-list"><div class="skel-list"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></div>
+  </div>
+
+  <!-- VOTE -->
+  <div id="panel-vote" class="tab-panel">
+
+    <div id="voting-mode-bar" class="mode-bar" style="display:none">
+      <span class="mode-label">Voting mode</span>
+      <div class="mode-btns">
+        <button id="mode-single" class="mode-btn active" onclick="window.setVotingMode('single')">Single pick</button>
+        <button id="mode-multi"  class="mode-btn"        onclick="window.setVotingMode('multi')">Multi pick</button>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="total-chip"><div class="total-num" id="stat-votes">0</div><div class="total-label">Total votes</div></div>
+      <div class="total-chip"><div class="total-num" id="stat-leader" style="font-size:20px">-</div><div class="total-label" id="stat-leader-label">Leading</div></div>
+    </div>
+    <div id="pending-voters" class="pending-card" style="display:none"></div>
+    <div id="vote-list" class="vote-list"></div>
+    <div id="admin-controls" style="display:none;margin-bottom:12px">
+      <div id="clear-confirm" class="confirm-banner" style="display:none">
+        <span>Clear all votes for a new week?</span>
+        <div style="display:flex;gap:8px">
+          <button class="confirm-no"  onclick="window.dismissClearVotes()">Cancel</button>
+          <button class="confirm-yes" onclick="window.executeClearVotes()">Yes, clear votes</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
+        <button class="turnout-btn" onclick="window.showTurnout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Who hasn&#39;t voted</button>
+        <button class="clear-votes-btn" onclick="window.confirmClearVotes()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Clear votes for new week</button>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Live vote breakdown</span>
+        <div class="live-indicator"><div class="live-dot"></div>Live</div>
+      </div>
+      <div class="chart-wrap"><canvas id="vote-chart"></canvas></div>
+      <div id="chart-admin-hint" class="chart-hint" style="display:none">Tap a bar to see who voted</div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="panel-history" class="tab-panel">
+    <div class="section-label" style="margin-bottom:14px">Previously discussed topics</div>
+    <div id="history-list" class="history-list"></div>
+  </div>
+
+  <!-- MEMBERS (admin only) -->
+  <div id="panel-members" class="tab-panel">
+    <div class="members-add-bar">
+      <h3>Add team member</h3>
+      <div class="members-form-row">
+        <input id="mem-email" class="add-input" type="email" placeholder="Email address">
+        <input id="mem-name"  class="add-input" type="text"  placeholder="Display name">
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <select id="mem-role" class="role-select">
+          <option value="member">Member</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="add-btn" style="float:none" onclick="window.addMember()">Add member</button>
+      </div>
+    </div>
+    <div class="section-label" id="member-count-label">Team members</div>
+    <div id="member-online" class="online-count" style="display:none"></div>
+    <div id="member-list" class="member-list" style="margin-top:10px"></div>
+  </div>
+
+
+  <!-- QUIZ TAB -->
+  <div id="panel-quiz" class="tab-panel">
+    <div class="q-subtabs">
+      <button class="q-subtab active" onclick="window.switchQTab('mine')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg> My Quizzes</button>
+      <button class="q-subtab" onclick="window.switchQTab('join')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg> Join</button>
+    </div>
+    <!-- My Quizzes -->
+    <div id="qsub-mine">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="section-label" style="margin:0" id="quiz-list-label">Your quizzes</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="turnout-btn" style="margin:0" onclick="window.openImport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg> Import quiz</button><button class="add-btn" style="float:none" onclick="window.createQuiz()">+ New Quiz</button></div>
+      </div>
+      <div id="admin-all-btn" style="display:none;margin-bottom:10px">
+        <button onclick="window.toggleAllQuizzes()" id="all-q-toggle" style="font-size:12px;background:transparent;border:1px solid var(--border);padding:5px 12px;border-radius:7px;cursor:pointer;color:var(--text-secondary)">Show all quizzes</button>
+      </div>
+      <div id="quiz-list"></div>
+    </div>
+    <!-- Join -->
+    <div id="qsub-join" style="display:none">
+      <div style="max-width:340px;margin:16px auto;text-align:center">
+        <div style="margin:0 auto 16px;width:66px;height:66px;border-radius:20px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg></div>
+        <div style="font-size:19px;font-weight:800;margin-bottom:5px;color:var(--text-primary)">Join a Quiz</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Enter the 6-character code from your host</p>
+        <input id="join-code" class="login-input" placeholder="e.g. AB12CD" maxlength="6"
+               style="text-transform:uppercase;letter-spacing:4px;font-size:22px;text-align:center;font-weight:700"
+               oninput="this.value=this.value.toUpperCase()"
+               onkeydown="if(event.key==='Enter')window.joinByCode()">
+        <button class="login-btn" onclick="window.joinByCode()" style="margin-top:4px">Join Quiz <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <p id="join-error" style="color:var(--danger);font-size:13px;margin-top:8px;min-height:18px"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ EDITOR -->
+  <div id="quiz-editor" class="quiz-fs" style="display:none">
+    <div class="quiz-fs-header">
+      <button class="quiz-fs-back" onclick="window.closeQuizEditor()" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+      <div class="quiz-fs-title" id="qe-header-title">Edit Quiz</div>
+      <button class="add-btn" style="float:none;white-space:nowrap" onclick="window.saveAndCloseEditor()">Save<svg width="15" height="15" style="margin-left:6px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+    </div>
+    <div class="quiz-fs-body">
+      <input id="qe-title" class="quiz-title-input" placeholder="Quiz title..." maxlength="80"
+             oninput="document.getElementById('qe-header-title').textContent=this.value||'Edit Quiz'">
+      <div class="section-label" style="margin-bottom:8px">Questions</div>
+      <div id="qe-questions"></div>
+      <button class="add-q-btn" onclick="window.addQuestion()">+ Add question</button>
+    </div>
+  </div>
+
+  <!-- HOST SESSION -->
+  <div id="quiz-host" class="qs-screen" style="display:none">
+    <!-- Lobby -->
+    <div id="qh-lobby" class="qs-lobby-bg" style="flex:1;display:flex;flex-direction:column">
+      <div class="qs-header">
+        <div class="qs-logo-txt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg> Quiz Lobby</div>
+        <button class="qs-end-btn" onclick="window.endHostSession()">End Session</button>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 20px">
+        <div style="text-align:center;color:rgba(255,255,255,.75);font-size:13px;margin-bottom:4px">
+          Players join at <strong>this app's address</strong> &mdash; Quiz tab &#x2192; Join
+        </div>
+        <div class="qs-code-box">
+          <div class="qs-code-label">Game Code</div>
+          <div class="qs-code-val" id="qh-code">------</div>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:8px">
+          <span id="qh-player-count">0</span> player(s) joined
+        </div>
+        <div id="qh-players-grid" class="qs-players-grid"></div>
+        <label class="qs-auto-lbl">
+          <input type="checkbox" id="qh-auto-advance" onchange="window.setAutoAdvance(this.checked)">
+          Auto-advance when timer ends
+        </label>
+        <label class="qs-auto-lbl">
+          <input type="checkbox" id="qh-allow-changes" checked onchange="window.setAllowChanges(this.checked)">
+          Allow answer changes
+        </label>
+        <button class="qs-start-btn" id="qh-start-btn" onclick="window.startGame()">Start Game <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+        <div class="qs-pup-info">
+        <h4>How to play</h4>
+        <div class="row"><b>⚡ Speed</b><span>Answer fast to score big. The clock never stops.</span></div>
+        <div class="row"><b>🔥 Streak</b><span>Chain correct answers for bonus points.</span></div>
+        <div class="row"><b>50:50</b><span>Zap two wrong answers.</span></div>
+        <div class="row"><b>2× Points</b><span>Double your points, or take a small hit if you miss.</span></div>
+        <div class="row"><b>Ask Crowd</b><span>Peek at what the room is picking.</span></div>
+        <div class="row"><b>Change</b><span class="howto-change-text"></span></div>
+      </div>
+      </div>
+    </div>
+    <!-- Question (host sees response bars) -->
+    <div id="qh-question" class="qs-dark" style="display:none;flex:1;flex-direction:column">
+      <div class="qs-topbar">
+        <div class="qs-q-meta" id="qh-qnum">Q1 of 1</div>
+        <div class="qs-timer-num" id="qh-timer">20</div>
+        <div class="qs-q-meta"><span id="qh-resp-count">0</span> answered</div>
+      </div>
+      <div class="qs-progress"><div class="qs-progress-fill" id="qh-prog" style="width:100%"></div></div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:18px 0">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-align:center;margin-bottom:6px" id="qh-pts-label"></div>
+        <div class="qs-q-text" id="qh-q-text"></div>
+        <img id="qh-q-image" class="qs-q-img" style="display:none" alt="">
+        <div id="qh-resp-bars" class="qs-resp-bars"></div>
+      </div>
+      <div style="padding:14px;text-align:center;border-top:1px solid rgba(255,255,255,.1)">
+        <button class="qs-next-btn" onclick="window.hostReveal()">Reveal Answers</button>
+      </div>
+    </div>
+    <!-- Reveal (host) -->
+    <div id="qh-reveal" class="qs-dark" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px">
+      <div class="qs-q-text" id="qh-rev-q" style="margin-bottom:4px"></div>
+      <div id="qh-rev-opts" class="qs-answer-grid" style="pointer-events:none"></div>
+      <div style="text-align:center;color:rgba(255,255,255,.7);font-size:14px" id="qh-rev-stat"></div>
+      <button class="qs-next-btn" onclick="window.hostLeaderboard()">Leaderboard <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+    <!-- Leaderboard (host) -->
+    <div id="qh-leaderboard" class="qs-dark" style="display:none;flex:1;flex-direction:column;padding:20px">
+      <div style="font-size:19px;font-weight:800;color:white;text-align:center;margin-bottom:16px">&#x1F3C6; Leaderboard</div>
+      <div id="qh-lb-list" style="max-width:580px;margin:0 auto;width:100%;flex:1"></div>
+      <div style="text-align:center;margin-top:20px;padding-bottom:10px">
+        <button class="qs-next-btn" id="qh-next-btn" onclick="window.hostNextQuestion()">Next Question &#x2192;</button>
+      </div>
+    </div>
+    <!-- End (host) -->
+    <div id="qh-end" class="qs-dark" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+      <div style="font-size:48px;margin-bottom:10px">&#x1F389;</div>
+      <div style="font-size:22px;font-weight:800;color:white;margin-bottom:4px">Quiz Complete!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px">Final Standings</div>
+      <div id="qh-end-lb" style="max-width:520px;width:100%;margin-bottom:20px"></div>
+      <button class="qs-next-btn" onclick="window.endHostSession()">Back to My Quizzes</button>
+    </div>
+  </div>
+
+  <!-- PLAYER SESSION -->
+  <div id="quiz-player" class="qs-screen" style="display:none">
+    <!-- Lobby -->
+    <div id="qp-lobby" class="qs-lobby-bg" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 20px;position:relative">
+      <button class="qs-end-btn" style="position:absolute;top:16px;right:16px" onclick="window.leavePlayerSession()">Leave</button>
+      <div style="font-size:48px;margin-bottom:14px">&#x23F3;</div>
+      <div style="font-size:20px;font-weight:800;color:white" id="qp-quiz-title"></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65);margin-top:8px">Waiting for host to start the game...</div>
+      <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.45)"><span id="qp-player-count">0</span> in lobby</div>
+      <div class="qs-pup-info">
+        <h4>How to play</h4>
+        <div class="row"><b>⚡ Speed</b><span>Answer fast to score big. The clock never stops.</span></div>
+        <div class="row"><b>🔥 Streak</b><span>Chain correct answers for bonus points.</span></div>
+        <div class="row"><b>50:50</b><span>Zap two wrong answers.</span></div>
+        <div class="row"><b>2× Points</b><span>Double your points, or take a small hit if you miss.</span></div>
+        <div class="row"><b>Ask Crowd</b><span>Peek at what the room is picking.</span></div>
+        <div class="row"><b>Change</b><span class="howto-change-text"></span></div>
+      </div>
+    </div>
+    <!-- Question (player) -->
+    <div id="qp-question" class="qs-dark" style="display:none;flex:1;flex-direction:column">
+      <div class="qs-topbar">
+        <div class="qs-q-meta" id="qp-qnum">Q1</div>
+        <div class="qs-timer-num" id="qp-timer">20</div>
+        <div class="qs-q-meta" id="qp-pts-label"></div>
+      </div>
+      <div class="qs-progress"><div class="qs-progress-fill" id="qp-prog" style="width:100%"></div></div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:18px 0">
+        <div class="qs-q-text" id="qp-q-text" style="flex:1;display:flex;align-items:center;justify-content:center;padding-bottom:8px"></div>
+        <img id="qp-q-image" class="qs-q-img" style="display:none" alt="">
+        <div id="qp-pups" class="qs-pups"></div>
+        <div id="qp-opts" class="qs-answer-grid" style="padding-bottom:8px"></div>
+        <div id="qp-crowd" style="display:none;gap:6px;padding:0 16px 12px"></div>
+      </div>
+    </div>
+    <!-- Waiting after answer -->
+    <div id="qp-waiting" class="qs-dark" style="display:none;flex:1">
+      <div class="qs-wait-wrap">
+        <div class="qs-wait-icon" id="qp-wait-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/></svg></div>
+        <div style="font-size:16px;font-weight:700;color:white;margin-top:14px" id="qp-wait-msg">Answer locked in!</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.55);margin-top:6px">Waiting for the host…</div>
+      </div>
+    </div>
+    <!-- Reveal (player) -->
+    <div id="qp-reveal" class="qs-dark" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:10px">
+      <div class="qs-result-icon" id="qp-rev-icon">&#x2713;</div>
+      <div style="font-size:17px;font-weight:700;color:white" id="qp-rev-msg"></div>
+      <div class="qs-pts-flash" id="qp-rev-pts"></div>
+      <div id="qp-rev-opts" class="qs-answer-grid" style="pointer-events:none;width:100%;max-width:580px;margin-top:10px"></div>
+    </div>
+    <!-- Leaderboard (player) -->
+    <div id="qp-leaderboard" class="qs-dark" style="display:none;flex:1;flex-direction:column;padding:20px">
+      <div style="font-size:18px;font-weight:800;color:white;text-align:center;margin-bottom:14px">&#x1F3C6; Leaderboard</div>
+      <div id="qp-lb-list" style="max-width:560px;margin:0 auto;width:100%;flex:1"></div>
+      <div style="text-align:center;padding:14px 0;font-size:13px;color:rgba(255,255,255,.5)">Next question coming up...</div>
+    </div>
+    <!-- End (player) -->
+    <div id="qp-end" class="qs-dark" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+      <div style="font-size:52px;margin-bottom:10px" id="qp-end-icon">&#x1F389;</div>
+      <div style="font-size:21px;font-weight:800;color:white" id="qp-end-msg">Quiz Complete!</div>
+      <div style="font-size:16px;color:#72C219;margin-top:6px;font-weight:700" id="qp-end-rank"></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:3px" id="qp-end-score"></div>
+      <div id="qp-end-lb" style="max-width:500px;width:100%;margin:18px 0"></div>
+      <button class="qs-next-btn" onclick="window.leavePlayerSession()">Back to Quiz</button>
+    </div>
+  </div>
+
+<!-- Voter slide-up panel (admin only) -->
+<div id="vp-overlay" class="vp-overlay" onclick="window.closeVoterPanel()"></div>
+<div id="vp-panel" class="vp-panel">
+  <div class="vp-handle"></div>
+  <div class="vp-header">
+    <div class="vp-letter" id="vp-letter"></div>
+    <div style="flex:1;min-width:0">
+      <div class="vp-topic" id="vp-topic"></div>
+      <div class="vp-count" id="vp-count"></div>
+    </div>
+    <button class="vp-close" onclick="window.closeVoterPanel()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+  </div>
+  <div id="vp-list" class="vp-list"></div>
+</div>
+</div>
+
+<div id="edit-overlay" class="overlay" onclick="window.closeEdit()"></div>
+<div id="edit-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+  <div class="modal-title" id="edit-modal-title">Edit topic</div>
+  <input id="edit-input" class="modal-input" maxlength="120" placeholder="Topic title">
+  <textarea id="edit-context" class="modal-input" rows="3" style="margin-top:8px;resize:none;overflow:hidden" placeholder="Context (optional)"></textarea>
+  <div id="edit-addedby-row" style="display:none;margin-top:8px">
+    <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Added by (admin edit)</label>
+    <input id="edit-addedby" class="modal-input" placeholder="Display name">
+  </div>
+  <div class="modal-actions">
+    <button class="modal-cancel" onclick="window.closeEdit()">Cancel</button>
+    <button class="modal-save"   onclick="window.saveEdit()">Save changes</button>
+  </div>
+</div>
+<div id="turnout-overlay" class="overlay" onclick="window.closeTurnout()"></div>
+<div id="turnout-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="turnout-title" style="max-width:460px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="modal-title" id="turnout-title" style="margin:0">Voter turnout</div>
+    <button class="vp-close" onclick="window.closeTurnout()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+  </div>
+  <div id="turnout-body"></div>
+  <button id="turnout-nudge" class="nudge-send-btn" style="display:none" onclick="window.nudgeNonVoters()">Nudge them to vote</button>
+</div>
+<div id="nudge-overlay" class="overlay" style="z-index:450" onclick="window.closeNudge()"></div>
+<div id="nudge-modal" role="dialog" aria-modal="true" aria-labelledby="nudge-title">
+  <div class="nudge-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5z"/><path d="M22 19H2"/></svg></div>
+  <div class="nudge-title" id="nudge-title">Your vote is needed</div>
+  <div class="nudge-sub" id="nudge-sub"></div>
+  <button class="nudge-cta" onclick="window.goVoteFromNudge()">Vote now</button>
+  <button class="nudge-later" onclick="window.closeNudge()">Maybe later</button>
+</div>
+<div id="medit-overlay" class="overlay" onclick="window.closeMemberEdit()"></div>
+<div id="medit-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="medit-title" style="max-width:420px">
+  <div class="modal-title" id="medit-title">Edit</div>
+  <input id="medit-input" class="modal-input" type="text">
+  <div id="medit-note" style="font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.5;display:none"></div>
+  <div class="modal-actions">
+    <button class="modal-cancel" onclick="window.closeMemberEdit()">Cancel</button>
+    <button class="modal-save" onclick="window.saveMemberEdit()">Save</button>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="quiz-preview" class="qs-screen qs-dark" style="display:none">
+  <div class="qs-topbar">
+    <div class="qs-q-meta" id="pv-qnum">Q1</div>
+    <div class="qs-timer-num" id="pv-timer">20</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:#72C219;text-transform:uppercase">Preview</span>
+      <button class="qs-end-btn" onclick="window.pvClose()">Close</button>
+    </div>
+  </div>
+  <div class="qs-progress"><div class="qs-progress-fill" id="pv-prog" style="width:100%"></div></div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:16px 0">
+    <div class="qs-q-text" id="pv-qtext" style="padding-bottom:8px"></div>
+    <img id="pv-qimage" class="qs-q-img" style="display:none" alt="">
+    <div id="pv-pups" class="qs-pups"></div>
+    <div id="pv-answers" class="qs-answer-grid"></div>
+    <div id="pv-crowd" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 16px 4px"></div>
+  </div>
+  <div id="pv-footer" style="padding:16px;text-align:center;border-top:1px solid rgba(255,255,255,.1);min-height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column"></div>
+</div>
+
+<button id="sfx-toggle" onclick="window.toggleSound()" aria-label="Toggle sound" style="display:none"></button>
+
+<div id="quiz-import" class="quiz-fs" style="display:none">
+  <div class="quiz-fs-header">
+    <button class="quiz-fs-back" onclick="window.closeImport()" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
+    <div class="quiz-fs-title">Import quiz</div>
+    <button class="add-btn" style="float:none;white-space:nowrap" onclick="window.runImport()">Import</button>
+  </div>
+  <div class="quiz-fs-body">
+    <input id="import-title" class="quiz-title-input" placeholder="Quiz title (optional)" maxlength="80">
+    <div class="import-help">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text-primary)">Paste your quiz in this format</div>
+      <pre>1. What is the capital of France? [20s, 1000pts]
+- London
+* Paris
+- Rome
+- Madrid
+
+2. The Earth is flat. (TF)
+- True
+* False
+
+3. Pick all primary colours (MULTI)
+* Red
+* Blue
+- Green</pre>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:10px;line-height:1.6">Mark the correct answer with <b>*</b> and wrong ones with <b>-</b>. Add <b>(TF)</b> for True/False or <b>(MULTI)</b> for multiple correct answers. The <b>[20s, 1000pts]</b> time/points part is optional.</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="turnout-btn" style="margin:0" onclick="window.loadImportExample()">Load example</button>
+        <button class="turnout-btn" style="margin:0" onclick="window.copyAIPrompt()">Copy AI prompt</button>
+      </div>
+    </div>
+    <textarea id="import-text" class="qe-input" style="min-height:240px;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6" placeholder="Paste your quiz here, or tap Load example above..."></textarea>
+    <div id="import-error" style="color:var(--danger);font-size:13px;margin-top:10px;white-space:pre-line;line-height:1.6"></div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
